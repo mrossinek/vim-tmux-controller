@@ -1,3 +1,8 @@
+" do not load multiple times
+if exists('g:vtc_loaded')
+        finish
+endif
+
 " executes a given command in the tmux shell
 function! s:ExecTmuxCommand(cmd)
         return system('tmux '.a:cmd)
@@ -41,7 +46,16 @@ function! s:AttachRunnerPane()
         endif
         if len(split(s:ExecTmuxCommand('list-panes'), '\n')) == 1
                 " only vim pane exists so far
-                let t:runner_pane_id = str2nr(split(s:ExecTmuxCommand('split-window -P -F "#D" -v -l 10'), '%')[0])
+                if g:vtc_percentage
+                        if g:vtc_orientiation =~# 'v'
+                                let t:converted_pane_size = system('tmux display -p "#{window_height}"') / g:vtc_pane_size
+                        else
+                                let t:converted_pane_size = system('tmux display -p "#{window_width}"') / g:vtc_pane_size
+                        endif
+                else
+                        let t:converted_pane_size = g:vtc_pane_size
+                endif
+                let t:runner_pane_id = str2nr(split(s:ExecTmuxCommand('split-window -P -F "#D" -'.g:vtc_orientiation.' -l '.t:converted_pane_size), '%')[0])
                 call s:ExecTmuxCommand('last-pane')
         else
                 call s:ExecTmuxCommand('display-panes -d 0 "select-pane -t %%" \; "last-pane"')
@@ -52,13 +66,11 @@ function! s:AttachRunnerPane()
 endfunction
 
 " detaches from the runner pane
-" stores the last runner pane id for possible later use
 function! s:DetachRunnerPane()
         if !exists('t:runner_pane_id')
                 echo 'No runner pane to detach from.'
                 return
         endif
-        let t:prev_runner_pane_id = t:runner_pane_id
         unlet t:runner_pane_id
 endfunction
 
@@ -185,6 +197,10 @@ endfunction
 
 " sends the specified command to tmux
 function! s:TriggerTmuxCommand()
+        if g:vtc_initial_command !=# '' && !exists('t:init_cmd_read')
+                call s:SetTmuxCommand(g:vtc_initial_command)
+                let t:init_cmd_read = 1
+        endif
         if !exists('t:tmux_command')
                 call s:SetTmuxCommand()
         endif
@@ -197,8 +213,15 @@ endfunction
 
 " initializes some variables
 function! s:Initialize()
-        let s:vim_pane_id = s:GetPaneId()
+        " global variables
+        let g:vtc_initial_command = ''
+        let g:vtc_orientiation = 'v'
+        let g:vtc_percentage = 0
+        let g:vtc_pane_size = 10
+
+        " local variables
         " use the currently active pane on vim startup
+        let s:vim_pane_id = s:GetPaneId()
 endfunction
 
 " make some function available via commands

@@ -105,7 +105,25 @@ MAPPINGS                                *vim-tmux-controller-mappings*
 ==============================================================================
 CONFIGURATION                           *vim-tmux-controller-configuration*
 
-NOTE: work in progress
+*g:vtc_loaded*                          `Default: 0`
+Set this boolean to 1 in order to disable the plugin.
+
+*g:vtc_initial_command*                 `Default: ''`
+Defines the initial default command.
+
+*g:vtc_orientiation*                    `Default: 'v'`
+Defines the orientation of the window split performed when creating a new
+runner pane. Note: The possible values are `'v'` and `'h'`.
+
+*g:vtc_percentage*                      `Default: 0`
+Defines wether |g:vtc_pane_size| is given in percentages or absolute units of
+measure. Note: The possible values are `0` and `1`.
+
+*g:vtc_pane_size*                       `Default: 10`
+Defines the default size of the runner pane. If |g:vtc_percentage| is set to
+true, this value will be interpreted in percent, otherwise it corresponds to
+the number of lines (if |g:vtc_orientiation| is set to `'v'`) or the number of
+cells (for `'h',` respectively).
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:
