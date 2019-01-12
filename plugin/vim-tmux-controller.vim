@@ -71,6 +71,18 @@ function! s:ClearRunnerPane()
         call s:ExecTmuxCommand('send-keys -t %'.s:runner_pane_id.' clear Enter')
 endfunction
 
+" scroll inside the runner pane
+function! s:ScrollRunnerPane()
+        if !exists('s:runner_pane_id')
+                echoerr 'No runner pane to scroll in!'
+                return
+        endif
+        call s:ExecTmuxCommand('copy-mode -t %'.s:runner_pane_id)
+        while 1
+                call s:ExecTmuxCommand('send-keys -t %'.s:runner_pane_id.' '.nr2char(getchar()))
+        endwhile
+endfunction
+
 " moves focus to the runner pane
 function! s:FocusRunnerPane()
         if !exists('s:runner_pane_id')
@@ -82,7 +94,7 @@ endfunction
 
 " moves focus to the vim pane
 function! s:FocusVimPane()
-        call s:ExecTmuxCommand('select-pane -t '.s:vim_pane_id)
+        call s:ExecTmuxCommand('select-pane -t %'.s:vim_pane_id)
 endfunction
 
 " sets the command sent to tmux by default
@@ -135,6 +147,7 @@ function! s:DefineCommands()
         command! VtcFocusRunner call s:FocusRunnerPane()
         command! VtcKillRunner call s:KillRunnerPane()
         command! VtcClearRunner call s:ClearRunnerPane()
+        command! VtcScrollRunner call s:ScrollRunnerPane()
         command! VtcFlushCommand call s:FlushTmuxCommand()
         command! VtcSetCommand call s:SetTmuxCommand()
         command! VtcTriggerCommand call s:TriggerTmuxCommand()
@@ -152,6 +165,8 @@ function! s:DefineKeymaps()
         nnoremap <leader>tk :VtcKillRunner<cr>
         " tmux 'empty' (i.e. clear)
         nnoremap <leader>te :VtcClearRunner<cr>
+        " tmux scroll
+        nnoremap <leader>ts :VtcScrollRunner<cr>
         " tmux 'down' (i.e. flush)
         nnoremap <leader>tj :VtcFlushCommand<cr>
         " tmux command

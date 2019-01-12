@@ -43,7 +43,17 @@ COMMANDS                                *vim-tmux-controller-commands*
 *:VtcKillRunner*          Kills the runner pane, thereby closing it.
 
                                         *vim-tmux-controller-clear*
-*:VtcClearRunner*       Clears the runner pane.
+*:VtcClearRunner*         Clears the runner pane.
+
+                                        *vim-tmux-controller-scroll*
+*:VtcScrollRunner*        Allows scrolling the runner pane by entering
+                        copy-mode. WARNING: You will NOT be able to see your
+                        cursor because the vim pane remains the active one.
+                        Thus, you should prefer scrolling using `Ctrl+<key>`
+                        over movements with `h,j,k,l,w,b,etc.`. Visually
+                        selecting is still possible and will give you some
+                        idea of where your cursor is.
+                        This command is done when pressing `Ctrl+C`.
 
                                         *vim-tmux-controller-command*
 *:VtcSetCommand*          Sets the default command that is send to the runner
@@ -67,6 +77,7 @@ MAPPINGS                                *vim-tmux-controller-mappings*
 *<leader>tf*            |VtcFocusRunner|
 *<leader>tk*            |VtcKillRunner|
 *<leader>te*            |VtcClearRunner| `(mnemonic: empty = clear)`
+*<leader>ts*            |VtcScrollRunner|
 *<leader>tc*            |VtcSetCommand|
 *<leader>tt*            |VtcTriggerCommand|
 *<leader>tj*            |VtcFlushCommand| `(mnemonic: flush = down = j)`
