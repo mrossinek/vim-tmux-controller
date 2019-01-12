@@ -24,28 +24,28 @@ function! s:GetPaneId(...)
 endfunction
 
 function! s:ChangeRootDir()
-        if !exists('s:runner_pane_id')
+        if !exists('b:runner_pane_id')
                 echoerr 'No runner pane to specified yet!'
                 return
         endif
-        call s:ExecTmuxCommand('send-keys -t %'.s:runner_pane_id.' "cd '.getcwd().'" Enter')
+        call s:ExecTmuxCommand('send-keys -t %'.b:runner_pane_id.' "cd '.getcwd().'" Enter')
 endfunction
 
 " attach a runner pane
 "       a) create a new one if vim pane is only one in current window
 "       b) flash pane indices to choose from and set corresponding id
 function! s:AttachRunnerPane()
-        if exists('s:runner_pane_id')
+        if exists('b:runner_pane_id')
                 echoerr 'Cannot attach multiple runner panes!'
                 return
         endif
         if len(split(s:ExecTmuxCommand('list-panes'), '\n')) == 1
                 " only vim pane exists so far
-                let s:runner_pane_id = str2nr(split(s:ExecTmuxCommand('split-window -P -F "#D" -v -l 10'), '%')[0])
+                let b:runner_pane_id = str2nr(split(s:ExecTmuxCommand('split-window -P -F "#D" -v -l 10'), '%')[0])
                 call s:ExecTmuxCommand('last-pane')
         else
                 call s:ExecTmuxCommand('display-panes -d 0 "select-pane -t %% \; last-pane"')
-                let s:runner_pane_id = str2nr(split(s:ExecTmuxCommand('display-message -p -t ! "#D"'), '%')[0])
+                let b:runner_pane_id = str2nr(split(s:ExecTmuxCommand('display-message -p -t ! "#D"'), '%')[0])
         endif
         call s:ChangeRootDir()
         call s:ClearRunnerPane()
@@ -54,99 +54,99 @@ endfunction
 " detaches from the runner pane
 " stores the last runner pane id for possible later use
 function! s:DetachRunnerPane()
-        if !exists('s:runner_pane_id')
+        if !exists('b:runner_pane_id')
                 echo 'No runner pane to detach from.'
                 return
         endif
-        let s:prev_runner_pane_id = s:runner_pane_id
-        unlet s:runner_pane_id
+        let b:prev_runner_pane_id = b:runner_pane_id
+        unlet b:runner_pane_id
 endfunction
 
 " kills the runner pane
 function! s:KillRunnerPane()
-        if !exists('s:runner_pane_id')
+        if !exists('b:runner_pane_id')
                 echo 'No runner pane to kill.'
                 return
         endif
-        call s:ExecTmuxCommand('kill-pane -t %'.s:runner_pane_id)
-        unlet s:runner_pane_id
+        call s:ExecTmuxCommand('kill-pane -t %'.b:runner_pane_id)
+        unlet b:runner_pane_id
 endfunction
 
 " clears the runner pane
 function! s:ClearRunnerPane()
-        if !exists('s:runner_pane_id')
+        if !exists('b:runner_pane_id')
                 echo 'No runner pane to clear.'
                 return
         endif
-        call s:ExecTmuxCommand('send-keys -t %'.s:runner_pane_id.' clear Enter')
+        call s:ExecTmuxCommand('send-keys -t %'.b:runner_pane_id.' clear Enter')
 endfunction
 
 " scroll inside the runner pane
 function! s:ScrollRunnerPane()
-        if !exists('s:runner_pane_id')
+        if !exists('b:runner_pane_id')
                 echoerr 'No runner pane to scroll in!'
                 return
         endif
-        call s:ExecTmuxCommand('copy-mode -t %'.s:runner_pane_id)
+        call s:ExecTmuxCommand('copy-mode -t %'.b:runner_pane_id)
         while 1
-                call s:ExecTmuxCommand('send-keys -t %'.s:runner_pane_id.' '.nr2char(getchar()))
+                call s:ExecTmuxCommand('send-keys -t %'.b:runner_pane_id.' '.nr2char(getchar()))
         endwhile
 endfunction
 
 " moves focus to the runner pane
 function! s:FocusRunnerPane()
-        if !exists('s:runner_pane_id')
+        if !exists('b:runner_pane_id')
                 echoerr 'No runner pane specified yet!'
                 return
         endif
-        call s:ExecTmuxCommand('select-pane -t %'.s:runner_pane_id)
+        call s:ExecTmuxCommand('select-pane -t %'.b:runner_pane_id)
 endfunction
 
 " moves focus to the vim pane
 function! s:FocusVimPane()
-        call s:ExecTmuxCommand('select-pane -t %'.s:vim_pane_id)
+        call s:ExecTmuxCommand('select-pane -t %'.b:vim_pane_id)
 endfunction
 
 " sets the command sent to tmux by default
 function! s:SetTmuxCommand(...)
-        if exists('s:tmux_command')
-                let choice = confirm('Overwrite the tmux command = '.s:tmux_command.' ?', "&Yes\n&No\n&Cancel", 1, 'Warning')
+        if exists('b:tmux_command')
+                let choice = confirm('Overwrite the tmux command = '.b:tmux_command.' ?', "&Yes\n&No\n&Cancel", 1, 'Warning')
                 if choice == 0
                         echoerr 'Tmux command could not be overwritten!'
                         return
                 elseif choice == 1
-                        unlet s:tmux_command
+                        unlet b:tmux_command
                 else
                         return
                 endif
         endif
         if a:0 == 1
-                let s:tmux_command = a:1
+                let b:tmux_command = a:1
         else
-                let s:tmux_command = input('Command: ')
+                let b:tmux_command = input('Command: ')
         endif
 endfunction
 
 " flushes the tmux command
 function! s:FlushTmuxCommand()
-        unlet s:tmux_command
+        unlet b:tmux_command
 endfunction
 
 " sends the specified command to tmux
 function! s:TriggerTmuxCommand()
-        if !exists('s:tmux_command')
+        if !exists('b:tmux_command')
                 call s:SetTmuxCommand()
         endif
-        if !exists('s:tmux_command')
+        if !exists('b:tmux_command')
                 echoerr 'No tmux command specified!'
                 return
         endif
-        call s:ExecTmuxCommand('send-keys -t %'.s:runner_pane_id.' '.s:tmux_command.' Enter')
+        call s:ExecTmuxCommand('send-keys -t %'.b:runner_pane_id.' '.b:tmux_command.' Enter')
 endfunction
 
 " initializes some variables
 function! s:Initialize()
-        let s:vim_pane_id = s:GetPaneId()
+        let b:vim_pane_id = s:GetPaneId()
         " use the currently active pane on vim startup
 endfunction
 
