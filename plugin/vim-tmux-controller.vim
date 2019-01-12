@@ -102,6 +102,39 @@ function! s:FocusRunnerPane()
         call s:ExecTmuxCommand('select-pane -t %'.t:runner_pane_id)
 endfunction
 
+" zooms into the runner pane
+function! s:ZoomRunnerPane()
+        if !exists('t:runner_pane_id')
+                echoerr 'No runner pane specified yet!'
+                return
+        endif
+        call s:ExecTmuxCommand('resize-pane -Z -t %'.t:runner_pane_id)
+        if !exists('s:tmux_prefix')
+                let s:tmux_prefix = system("tmux list-keys | grep send-prefix | awk '{print $4}'")
+                let s:tmux_prefix = substitute(s:tmux_prefix, '\n', '', '')
+        endif
+        if !exists('s:tmux_zoom_key')
+                let s:tmux_zoom_key = system("tmux list-keys | grep 'resize-pane -Z' | awk '{print $4}'")
+                let s:tmux_zoom_key = substitute(s:tmux_zoom_key, '\n', '', '')
+        endif
+        call s:ExecTmuxCommand('send-keys -t %'.t:runner_pane_id.' "echo -e \"\033[0;93;1mZoom out using: \033[0;91;1m'.s:tmux_prefix.' + '.s:tmux_zoom_key.'\033[0m\nOr with tmux resize-pane -Z\"" Enter')
+endfunction
+
+" hides the runner pane (the same as zooming into the vim pane)
+function! s:HideRunnerPane()
+        call s:ExecTmuxCommand('resize-pane -Z -t %'.t:vim_pane_id)
+        if !exists('s:tmux_prefix')
+                let s:tmux_prefix = system("tmux list-keys | grep send-prefix | awk '{print $4}'")
+                let s:tmux_prefix = substitute(s:tmux_prefix, '\n', '', '')
+        endif
+        if !exists('s:tmux_zoom_key')
+                let s:tmux_zoom_key = system("tmux list-keys | grep 'resize-pane -Z' | awk '{print $4}'")
+                let s:tmux_zoom_key = substitute(s:tmux_zoom_key, '\n', '', '')
+        endif
+        echohl WarningMsg | echon 'Zoom out using: ' | echohl ErrorMsg | echon s:tmux_prefix.' + '.s:tmux_zoom_key | echohl None | echo 'Or with :!tmux resize-pane -Z'
+endfunction
+
+
 " moves focus to the vim pane
 function! s:FocusVimPane()
         call s:ExecTmuxCommand('select-pane -t %'.s:vim_pane_id)
@@ -155,6 +188,8 @@ function! s:DefineCommands()
         command! VtcAttachRunner call s:AttachRunnerPane()
         command! VtcDetachRunner call s:DetachRunnerPane()
         command! VtcFocusRunner call s:FocusRunnerPane()
+        command! VtcZoomRunner call s:ZoomRunnerPane()
+        command! VtcHideRunner call s:HideRunnerPane()
         command! VtcKillRunner call s:KillRunnerPane()
         command! VtcClearRunner call s:ClearRunnerPane()
         command! VtcScrollRunner call s:ScrollRunnerPane()
@@ -171,6 +206,10 @@ function! s:DefineKeymaps()
         nnoremap <leader>td :VtcDetachRunner<cr>
         " tmux focus
         nnoremap <leader>tf :VtcFocusRunner<cr>
+        " tmux zoom
+        nnoremap <leader>tz :VtcZoomRunner<cr>
+        " tmux hide
+        nnoremap <leader>th :VtcHideRunner<cr>
         " tmux kill
         nnoremap <leader>tk :VtcKillRunner<cr>
         " tmux 'empty' (i.e. clear)

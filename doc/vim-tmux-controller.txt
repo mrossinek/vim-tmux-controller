@@ -41,6 +41,16 @@ COMMANDS                                *vim-tmux-controller-commands*
                         NOTE: |VTC| plays well with the |vim-tmux-navigator|
                         plugin: (github.com/christoomey/vim-tmux-navigator)
 
+                                        *vim-tmux-controller-zoom*
+*:VtcZoomRunner*          Zooms into the runner pane. I.e. it resizes the pane
+                        to occupy the entire screen. It also prints an info
+                        for the user on how to zoom out again.
+
+                                        *vim-tmux-controller-hide*
+*:VtcHideRunner*          Hides the runner pane (this is equivalent to zooming
+                        into the vim pane). This command also prints an info
+                        for the user on how to zoom out again.
+
                                         *vim-tmux-controller-kill*
 *:VtcKillRunner*          Kills the runner pane, thereby closing it.
 
