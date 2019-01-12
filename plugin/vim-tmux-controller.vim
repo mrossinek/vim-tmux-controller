@@ -44,7 +44,7 @@ function! s:AttachRunnerPane()
                 let t:runner_pane_id = str2nr(split(s:ExecTmuxCommand('split-window -P -F "#D" -v -l 10'), '%')[0])
                 call s:ExecTmuxCommand('last-pane')
         else
-                call s:ExecTmuxCommand('display-panes -d 0 "select-pane -t %% \; last-pane"')
+                call s:ExecTmuxCommand('display-panes -d 0 "select-pane -t %%" \; "last-pane"')
                 let t:runner_pane_id = str2nr(split(s:ExecTmuxCommand('display-message -p -t ! "#D"'), '%')[0])
         endif
         call s:ChangeRootDir()
@@ -104,7 +104,7 @@ endfunction
 
 " moves focus to the vim pane
 function! s:FocusVimPane()
-        call s:ExecTmuxCommand('select-pane -t %'.t:vim_pane_id)
+        call s:ExecTmuxCommand('select-pane -t %'.s:vim_pane_id)
 endfunction
 
 " sets the command sent to tmux by default
@@ -146,7 +146,7 @@ endfunction
 
 " initializes some variables
 function! s:Initialize()
-        let t:vim_pane_id = s:GetPaneId()
+        let s:vim_pane_id = s:GetPaneId()
         " use the currently active pane on vim startup
 endfunction
 
