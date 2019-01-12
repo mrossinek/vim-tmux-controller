@@ -23,6 +23,14 @@ function! s:GetPaneId(...)
         endfor
 endfunction
 
+function! s:ChangeRootDir()
+        if !exists('s:runner_pane_id')
+                echoerr 'No runner pane to specified yet!'
+                return
+        endif
+        call s:ExecTmuxCommand('send-keys -t %'.s:runner_pane_id.' "cd '.getcwd().'" Enter')
+endfunction
+
 " attach a runner pane
 "       a) create a new one if vim pane is only one in current window
 "       b) flash pane indices to choose from and set corresponding id
@@ -39,6 +47,8 @@ function! s:AttachRunnerPane()
                 call s:ExecTmuxCommand('display-panes -d 0 "select-pane -t %% \; last-pane"')
                 let s:runner_pane_id = str2nr(split(s:ExecTmuxCommand('display-message -p -t ! "#D"'), '%')[0])
         endif
+        call s:ChangeRootDir()
+        call s:ClearRunnerPane()
 endfunction
 
 " detaches from the runner pane

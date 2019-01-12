@@ -30,6 +30,8 @@ COMMANDS                                *vim-tmux-controller-commands*
 *:VtcAttachRunner*        Attaches a runner pane. If vim takes up the only pane
                         in the window, a new one is created. Otherwise the
                         user can specify a pane of his liking.
+                        The pane will automatically change into the current
+                        working directory of the vim session.
 
                                         *vim-tmux-controller-detach*
 *:VtcDetachRunner*        Detaches the runner pane without closing it.
