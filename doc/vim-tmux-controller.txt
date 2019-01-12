@@ -1,0 +1,76 @@
+*vim-tmux-controller.txt* Plugin to control tmux from within vim
+
+Author:  Max Rossmannek
+License: MIT
+
+==============================================================================
+CONTENTS                                *vim-tmux-controller-contents*
+
+        1. Introduction.................|vim-tmux-controller|
+        2. Commands.....................|vim-tmux-controller-commands|
+        3. Mappings.....................|vim-tmux-controller-mappings|
+        4. Configuration................|vim-tmux-controller-configuration|
+
+==============================================================================
+INTRODUCTION                            *vim-tmux-controller*
+
+The vim tmux controller *VTC* is a plugin that allows one to control tmux from
+within vim. The use-case in mind during the development is to control a
+designated tmux runner pane to continuously make or test your code.
+A future feature will be to send selections from within vim directly to the
+tmux pane for execution. This will allow on-the-fly interpretation of
+languages such as python.
+
+NOTE: This plugin has only been tested using tmux v2.8 and neovim v0.3.3.
+
+==============================================================================
+COMMANDS                                *vim-tmux-controller-commands*
+
+                                        *vim-tmux-controller-attach*
+*:VtcAttachRunner*        Attaches a runner pane. If vim takes up the only pane
+                        in the window, a new one is created. Otherwise the
+                        user can specify a pane of his liking.
+
+                                        *vim-tmux-controller-detach*
+*:VtcDetachRunner*        Detaches the runner pane without closing it.
+
+                                        *vim-tmux-controller-focus*
+*:VtcFocusRunner*         Moves the focus to the runner pane.
+                        NOTE: |VTC| plays well with the |vim-tmux-navigator|
+                        plugin: (github.com/christoomey/vim-tmux-navigator)
+
+                                        *vim-tmux-controller-kill*
+*:VtcKillRunner*          Kills the runner pane, thereby closing it.
+
+                                        *vim-tmux-controller-command*
+*:VtcSetCommand*          Sets the default command that is send to the runner
+                        pane for execution.
+
+                                        *vim-tmux-controller-trigger*
+*:VtcTriggerCommand*      Triggers the default command for execution. Allows the
+                        user to specify a new command, in case no one exists
+                        yet.
+
+                                        *vim-tmux-controller-flush*
+*:VtcFlushCommand*        Deletes the default command (i.e. flushes it).
+
+==============================================================================
+MAPPINGS                                *vim-tmux-controller-mappings*
+
+|VTC| comes with all of its commands premapped to some |leader| key mappings:
+
+*<leader>ta*            |VtcAttachRunner|
+*<leader>td*            |VtcDetachRunner|
+*<leader>tf*            |VtcFocusRunner|
+*<leader>tk*            |VtcKillRunner|
+*<leader>tc*            |VtcSetCommand|
+*<leader>tt*            |VtcTriggerCommand|
+*<leader>tj*            |VtcFlushCommand| `(mnemonic: flush = down = j)`
+
+==============================================================================
+CONFIGURATION                           *vim-tmux-controller-configuration*
+
+NOTE: work in progress
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
