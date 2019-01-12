@@ -128,11 +128,25 @@ function! s:DefineCommands()
         command! VtcKillRunner call s:KillRunnerPane()
         command! VtcFlushCommand call s:FlushTmuxCommand()
         command! VtcSetCommand call s:SetTmuxCommand()
-        command! VtcExecuteCommand call s:TriggerTmuxCommand()
+        command! VtcTriggerCommand call s:TriggerTmuxCommand()
 endfunction
 
 " define standard keymaps for some commands
 function! s:DefineKeymaps()
+        " tmux attach
+        nnoremap <leader>ta :VtcAttachRunner<cr>
+        " tmux detach
+        nnoremap <leader>td :VtcDetachRunner<cr>
+        " tmux focus
+        nnoremap <leader>tf :VtcFocusRunner<cr>
+        " tmux kill
+        nnoremap <leader>tk :VtcKillRunner<cr>
+        " tmux 'down' (i.e. flush)
+        nnoremap <leader>tj :VtcFlushCommand<cr>
+        " tmux command
+        nnoremap <leader>tc :VtcSetCommand<cr>
+        " tmux trigger
+        nnoremap <leader>tt :VtcTriggerCommand<cr>
 endfunction
 
 call s:Initialize()
