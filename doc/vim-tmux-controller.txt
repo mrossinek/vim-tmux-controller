@@ -87,6 +87,8 @@ MAPPINGS                                *vim-tmux-controller-mappings*
 *<leader>ta*            |VtcAttachRunner|
 *<leader>td*            |VtcDetachRunner|
 *<leader>tf*            |VtcFocusRunner|
+*<leader>tz*            |VtcZoomRunner|
+*<leader>th*            |VtcHideRunner|
 *<leader>tk*            |VtcKillRunner|
 *<leader>te*            |VtcClearRunner| `(mnemonic: empty = clear)`
 *<leader>ts*            |VtcScrollRunner|
