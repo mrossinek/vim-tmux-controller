@@ -39,7 +39,6 @@ function! s:AttachRunnerPane()
                 call s:ExecTmuxCommand('display-panes -d 0 "select-pane -t %% \; last-pane"')
                 let s:runner_pane_id = str2nr(split(s:ExecTmuxCommand('display-message -p -t ! "#D"'), '%')[0])
         endif
-        echo s:runner_pane_id
 endfunction
 
 " detaches from the runner pane
@@ -61,6 +60,15 @@ function! s:KillRunnerPane()
         endif
         call s:ExecTmuxCommand('kill-pane -t %'.s:runner_pane_id)
         unlet s:runner_pane_id
+endfunction
+
+" clears the runner pane
+function! s:ClearRunnerPane()
+        if !exists('s:runner_pane_id')
+                echo 'No runner pane to clear.'
+                return
+        endif
+        call s:ExecTmuxCommand('send-keys -t %'.s:runner_pane_id.' clear Enter')
 endfunction
 
 " moves focus to the runner pane
@@ -126,6 +134,7 @@ function! s:DefineCommands()
         command! VtcDetachRunner call s:DetachRunnerPane()
         command! VtcFocusRunner call s:FocusRunnerPane()
         command! VtcKillRunner call s:KillRunnerPane()
+        command! VtcClearRunner call s:ClearRunnerPane()
         command! VtcFlushCommand call s:FlushTmuxCommand()
         command! VtcSetCommand call s:SetTmuxCommand()
         command! VtcTriggerCommand call s:TriggerTmuxCommand()
@@ -141,6 +150,8 @@ function! s:DefineKeymaps()
         nnoremap <leader>tf :VtcFocusRunner<cr>
         " tmux kill
         nnoremap <leader>tk :VtcKillRunner<cr>
+        " tmux 'empty' (i.e. clear)
+        nnoremap <leader>te :VtcClearRunner<cr>
         " tmux 'down' (i.e. flush)
         nnoremap <leader>tj :VtcFlushCommand<cr>
         " tmux command

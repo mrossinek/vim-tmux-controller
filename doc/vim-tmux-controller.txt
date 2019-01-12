@@ -42,6 +42,9 @@ COMMANDS                                *vim-tmux-controller-commands*
                                         *vim-tmux-controller-kill*
 *:VtcKillRunner*          Kills the runner pane, thereby closing it.
 
+                                        *vim-tmux-controller-clear*
+*:VtcClearRunner*       Clears the runner pane.
+
                                         *vim-tmux-controller-command*
 *:VtcSetCommand*          Sets the default command that is send to the runner
                         pane for execution.
@@ -63,6 +66,7 @@ MAPPINGS                                *vim-tmux-controller-mappings*
 *<leader>td*            |VtcDetachRunner|
 *<leader>tf*            |VtcFocusRunner|
 *<leader>tk*            |VtcKillRunner|
+*<leader>te*            |VtcClearRunner| `(mnemonic: empty = clear)`
 *<leader>tc*            |VtcSetCommand|
 *<leader>tt*            |VtcTriggerCommand|
 *<leader>tj*            |VtcFlushCommand| `(mnemonic: flush = down = j)`
