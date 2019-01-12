@@ -79,6 +79,11 @@ COMMANDS                                *vim-tmux-controller-commands*
                                         *vim-tmux-controller-flush*
 *:VtcFlushCommand*        Deletes the default command (i.e. flushes it).
 
+                                        *vim-tmux-controller-kill-cmd*
+*:VtcKillCommand*         Kills the running command in the runner pane. First,
+                        a TERM signal is sent. If the process does not
+                        respond, this is followed by another KILL signal.
+
 ==============================================================================
 MAPPINGS                                *vim-tmux-controller-mappings*
 
@@ -95,6 +100,7 @@ MAPPINGS                                *vim-tmux-controller-mappings*
 *<leader>tc*            |VtcSetCommand|
 *<leader>tt*            |VtcTriggerCommand|
 *<leader>tj*            |VtcFlushCommand| `(mnemonic: flush = down = j)`
+*<leader>tx*            |VtcKillCommand| `(mnemonic: kill = cross out = x)`
 
 ==============================================================================
 CONFIGURATION                           *vim-tmux-controller-configuration*

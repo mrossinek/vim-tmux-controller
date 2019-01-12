@@ -165,6 +165,24 @@ function! s:FlushTmuxCommand()
         unlet t:tmux_command
 endfunction
 
+" kills the running tmux command
+function! s:KillTmuxCommand()
+        if !exists('t:runner_pane_id')
+                echoerr 'No runner pane specified yet!'
+                return
+        endif
+        let l:pane_pid = s:ExecTmuxCommand('display-message -p -t %'.t:runner_pane_id.' "#{pane_pid}"')
+        let l:processes = split(system('pstree -p -n -T '.l:pane_pid), '---')
+        if len(l:processes) > 1
+                let l:kill_pid = substitute(l:processes[1], '\D', '', 'g')
+                execute('!kill -s TERM '.l:kill_pid)
+                execute('silent !ps -p '.l:kill_pid.' > /dev/null')
+                if system('echo $?') != 0
+                        execute('!kill -s KILL '.l:kill_pid)
+                endif
+        endif
+endfunction
+
 " sends the specified command to tmux
 function! s:TriggerTmuxCommand()
         if !exists('t:tmux_command')
@@ -194,6 +212,7 @@ function! s:DefineCommands()
         command! VtcClearRunner call s:ClearRunnerPane()
         command! VtcScrollRunner call s:ScrollRunnerPane()
         command! VtcFlushCommand call s:FlushTmuxCommand()
+        command! VtcKillCommand call s:KillTmuxCommand()
         command! VtcSetCommand call s:SetTmuxCommand()
         command! VtcTriggerCommand call s:TriggerTmuxCommand()
 endfunction
@@ -218,6 +237,8 @@ function! s:DefineKeymaps()
         nnoremap <leader>ts :VtcScrollRunner<cr>
         " tmux 'down' (i.e. flush)
         nnoremap <leader>tj :VtcFlushCommand<cr>
+        " tmux 'cross out' (i.e. kill command)
+        nnoremap <leader>tx :VtcKillCommand<cr>
         " tmux command
         nnoremap <leader>tc :VtcSetCommand<cr>
         " tmux trigger
