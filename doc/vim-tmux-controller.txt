@@ -84,6 +84,15 @@ COMMANDS                                *vim-tmux-controller-commands*
                         a TERM signal is sent. If the process does not
                         respond, this is followed by another KILL signal.
 
+                                        *vim-tmux-controller-lines*
+*:VtcSendLines*           Sends the specified |range| of lines to the runner
+                        pane for execution. Mappings are provided for both,
+                        |normal| and |visual| mode.
+
+                                        *vim-tmux-controller-file*
+*:VtrSendFile*            This is a convenient shortcut to send the whole file
+                        for execution to the runner pane.
+
 ==============================================================================
 MAPPINGS                                *vim-tmux-controller-mappings*
 
@@ -101,6 +110,8 @@ MAPPINGS                                *vim-tmux-controller-mappings*
 *<leader>tt*            |VtcTriggerCommand|
 *<leader>tj*            |VtcFlushCommand| `(mnemonic: flush = down = j)`
 *<leader>tx*            |VtcKillCommand| `(mnemonic: kill = cross out = x)`
+*<leader>tl*            |VtcSendLines|
+*<leader>tg*            |VtcSendFile| `(mnemonic: file = all -> bottom = G)`
 
 ==============================================================================
 CONFIGURATION                           *vim-tmux-controller-configuration*

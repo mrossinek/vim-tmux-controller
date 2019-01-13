@@ -211,6 +211,18 @@ function! s:TriggerTmuxCommand()
         call s:ExecTmuxCommand('send-keys -t %'.t:runner_pane_id.' '.t:tmux_command.' Enter')
 endfunction
 
+" sends lines to runner pane for execution
+function! s:SendLines() range
+        for line in getline(a:firstline, a:lastline)
+                call s:ExecTmuxCommand('send-keys -t %'.t:runner_pane_id.' "'.line.'" Enter')
+        endfor
+endfunction
+
+" send entire file to runner pane for execution
+function! s:SendFile()
+        execute('%VtcSendLines')
+endfunction
+
 " initializes some variables
 function! s:Initialize()
         " global variables
@@ -238,6 +250,8 @@ function! s:DefineCommands()
         command! VtcKillCommand call s:KillTmuxCommand()
         command! VtcSetCommand call s:SetTmuxCommand()
         command! VtcTriggerCommand call s:TriggerTmuxCommand()
+        command! -range VtcSendLines <line1>,<line2>call s:SendLines()
+        command! VtcSendFile call s:SendFile()
 endfunction
 
 " define standard keymaps for some commands
@@ -266,6 +280,11 @@ function! s:DefineKeymaps()
         nnoremap <leader>tc :VtcSetCommand<cr>
         " tmux trigger
         nnoremap <leader>tt :VtcTriggerCommand<cr>
+        " tmux lines
+        nnoremap <leader>tl :VtcSendLines<cr>
+        vnoremap <leader>tl :VtcSendLines<cr>
+        " tmux 'G' (i.e. bottom = total file)
+        nnoremap <leader>tg :VtcSendFile<cr>
 endfunction
 
 call s:Initialize()
