@@ -69,6 +69,12 @@ COMMANDS                                *vim-tmux-controller-commands*
                         Note: copy-mode will intentionally not be left, in
                         order to be able to see, where one has scrolled too.
 
+                                        *vim-tmux-controller-rotate*
+*:VtcRotateRunner*        Rotates the current orientation of the vim and runner
+                        pane. WARNING: This is possibly the most unstable
+                        feature of this plugin and should be used with some
+                        scepticism sprinkled into the mix.
+
                                         *vim-tmux-controller-command*
 *:VtcSetCommand*          Sets the default command that is send to the runner
                         pane for execution.
@@ -108,6 +114,7 @@ MAPPINGS                                *vim-tmux-controller-mappings*
 *<leader>tk*            |VtcKillRunner|
 *<leader>te*            |VtcClearRunner| `(mnemonic: empty = clear)`
 *<leader>ts*            |VtcScrollRunner|
+*<leader>tr*            |VtcRotateRunner|
 *<leader>tc*            |VtcSetCommand|
 *<leader>tt*            |VtcTriggerCommand|
 *<leader>tj*            |VtcFlushCommand| `(mnemonic: flush = down = j)`
@@ -124,19 +131,24 @@ Set this boolean to 1 in order to disable the plugin.
 *g:vtc_initial_command*                 `Default: ''`
 Defines the initial default command.
 
-*g:vtc_orientiation*                    `Default: 'v'`
+*g:vtc_orientation*                     `Default: ``1`
 Defines the orientation of the window split performed when creating a new
-runner pane. Note: The possible values are `'v'` and `'h'`.
+runner pane. Note: The possible values are `'1'` which stands for the vim
+default of vertical splits and `'0'` which stands for the opposite, horizontal
+splits.
 
 *g:vtc_percentage*                      `Default: 0`
 Defines wether |g:vtc_pane_size| is given in percentages or absolute units of
 measure. Note: The possible values are `0` and `1`.
 
-*g:vtc_pane_size*                       `Default: 10`
-Defines the default size of the runner pane. If |g:vtc_percentage| is set to
-true, this value will be interpreted in percent, otherwise it corresponds to
-the number of lines (if |g:vtc_orientiation| is set to `'v'`) or the number of
-cells (for `'h',` respectively).
+*g:vtc_pane_height*                     `Default: 10`
+*g:vtc_pane_width*                      `Default: 85`
+Define the default sizes of the runner pane. If |g:vtc_percentage| is set to
+true, this value will be interpreted in percent, otherwise it is interpreted
+as the absolute value of lines (horizontally) or cells (vertically). Note:
+Both of these values are actively used regardless of the |g:vtc_orientation|
+setting! Once the user calls |VtcRotateRunner| the other dimension will be
+required to scale the pane accordingly.
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:

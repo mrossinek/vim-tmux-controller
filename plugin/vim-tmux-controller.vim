@@ -100,22 +100,27 @@ function! s:AttachRunnerPane()
                 echoerr 'Cannot attach multiple runner panes!'
                 return
         endif
+        if g:vtc_percentage
+                let t:converted_pane_height = system('tmux display -p "#{window_height}"') / g:vtc_pane_height
+                let t:converted_pane_width = system('tmux display -p "#{window_width}"') / g:vtc_pane_width
+        else
+                let t:converted_pane_height = g:vtc_pane_height
+                let t:converted_pane_width = g:vtc_pane_width
+        endif
         if len(split(s:ExecTmuxCommand('list-panes'), '\n')) == 1
                 " only vim pane exists so far
-                if g:vtc_percentage
-                        if g:vtc_orientiation =~# 'v'
-                                let t:converted_pane_size = system('tmux display -p "#{window_height}"') / g:vtc_pane_size
-                        else
-                                let t:converted_pane_size = system('tmux display -p "#{window_width}"') / g:vtc_pane_size
-                        endif
+                if g:vtc_orientation == 1
+                        let t:runner_pane_id = str2nr(split(s:ExecTmuxCommand('split-window -P -F "#D" -v -l '.t:converted_pane_height), '%')[0])
                 else
-                        let t:converted_pane_size = g:vtc_pane_size
+                        let t:runner_pane_id = str2nr(split(s:ExecTmuxCommand('split-window -P -F "#D" -h -l '.t:converted_pane_width), '%')[0])
                 endif
-                let t:runner_pane_id = str2nr(split(s:ExecTmuxCommand('split-window -P -F "#D" -'.g:vtc_orientiation.' -l '.t:converted_pane_size), '%')[0])
                 call s:ExecTmuxCommand('last-pane')
+                let t:current_orientation = g:vtc_orientation
         else
                 call s:ExecTmuxCommand('display-panes -d 0 "select-pane -t %%" \; "last-pane"')
                 let t:runner_pane_id = str2nr(split(s:ExecTmuxCommand('display-message -p -t ! "#D"'), '%')[0])
+                " assume attaching is done mostly to attain other orientation
+                let t:current_orientation = 1 - g:vtc_orientation
         endif
         call s:ExitCopyMode()
         call s:ChangeRootDir()
@@ -171,6 +176,25 @@ endfunction
 function! s:HideRunnerPane()
         call s:TmuxZoomWrapper(s:vim_pane_id)
         echohl WarningMsg | echon 'Zoom out using: ' | echohl ErrorMsg | echon s:tmux_prefix.' + '.s:tmux_zoom_key | echohl None | echon "\t[Or with :!tmux resize-pane -Z]"
+endfunction
+
+" rotates the runner and vim pane
+function! s:RotateRunnerPane()
+        let l:old_layout = s:ExecTmuxCommand('display-message -p "#{window_layout}"')
+        if t:current_orientation == 1
+                call s:ExecTmuxCommand('move-pane -d -h -t %'.s:vim_pane_id.' -s %'.t:runner_pane_id)
+                call s:ExecTmuxCommand('resize-pane -t %'.t:runner_pane_id.' -x '.t:converted_pane_width)
+                let t:current_orientation = 0
+        else
+                call s:ExecTmuxCommand('move-pane -d -v -t %'.s:vim_pane_id.' -s %'.t:runner_pane_id)
+                call s:ExecTmuxCommand('resize-pane -t %'.t:runner_pane_id.' -y '.t:converted_pane_height)
+                let t:current_orientation = 1
+        endif
+        let l:new_layout = s:ExecTmuxCommand('display-message -p "#{window_layout}"')
+        " ensures correct flipping in case of wrong initial orientation
+        if l:new_layout =~# l:old_layout
+                call s:RotateRunnerPane()
+        endif
 endfunction
 
 " }}}
@@ -263,9 +287,10 @@ endfunction
 function! s:Initialize()
         " global variables
         let g:vtc_initial_command = ''
-        let g:vtc_orientiation = 'v'
+        let g:vtc_orientation = 1
         let g:vtc_percentage = 0
-        let g:vtc_pane_size = 10
+        let g:vtc_pane_height = 10
+        let g:vtc_pane_width = 85
 
         " local variables
         " use the currently active pane on vim startup
@@ -282,6 +307,7 @@ function! s:DefineCommands()
         command! VtcKillRunner call s:KillRunnerPane()
         command! VtcClearRunner call s:ClearRunnerPane()
         command! VtcScrollRunner call s:ScrollRunnerPane()
+        command! VtcRotateRunner call s:RotateRunnerPane()
         command! VtcFlushCommand call s:FlushTmuxCommand()
         command! VtcKillCommand call s:KillTmuxCommand()
         command! VtcSetCommand call s:SetTmuxCommand()
@@ -308,6 +334,8 @@ function! s:DefineKeymaps()
         nnoremap <leader>te :VtcClearRunner<cr>
         " tmux scroll
         nnoremap <leader>ts :VtcScrollRunner<cr>
+        " tmux rotate
+        nnoremap <leader>tr :VtcRotateRunner<cr>
         " tmux 'down' (i.e. flush)
         nnoremap <leader>tj :VtcFlushCommand<cr>
         " tmux 'cross out' (i.e. kill command)
