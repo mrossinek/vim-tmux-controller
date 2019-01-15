@@ -8,6 +8,12 @@ function! s:ExecTmuxCommand(cmd)
         return system('tmux '.a:cmd)
 endfunction
 
+" sends keys to tmux shell
+function! s:SendTmuxKeys(keys)
+        let l:keys = substitute(a:keys, '"', '\\"', 'g')
+        return s:ExecTmuxCommand('send-keys -t %'.t:runner_pane_id.' "'.l:keys.'" Enter')
+endfunction
+
 " returns the unique tmux pane id of either
 "       a) the corresponding pane index given to the function
 "       b) the currently active pane
@@ -33,7 +39,7 @@ function! s:ChangeRootDir()
                 echoerr 'No runner pane to specified yet!'
                 return
         endif
-        call s:ExecTmuxCommand('send-keys -t %'.t:runner_pane_id.' "cd '.getcwd().'" Enter')
+        call s:SendTmuxKeys(getcwd())
 endfunction
 
 " attach a runner pane
@@ -90,7 +96,7 @@ function! s:ClearRunnerPane()
                 echo 'No runner pane to clear.'
                 return
         endif
-        call s:ExecTmuxCommand('send-keys -t %'.t:runner_pane_id.' clear Enter')
+        call s:SendTmuxKeys('clear')
 endfunction
 
 " scroll inside the runner pane
@@ -101,6 +107,7 @@ function! s:ScrollRunnerPane()
         endif
         call s:ExecTmuxCommand('copy-mode -t %'.t:runner_pane_id)
         while 1
+                " cannot use s:SendTmuxKeys because Enter shall not be printed
                 call s:ExecTmuxCommand('send-keys -t %'.t:runner_pane_id.' '.nr2char(getchar()))
         endwhile
 endfunction
@@ -129,7 +136,7 @@ function! s:ZoomRunnerPane()
                 let s:tmux_zoom_key = system("tmux list-keys | grep 'resize-pane -Z' | awk '{print $4}'")
                 let s:tmux_zoom_key = substitute(s:tmux_zoom_key, '\n', '', '')
         endif
-        call s:ExecTmuxCommand('send-keys -t %'.t:runner_pane_id.' "echo -e \"\033[0;93;1mZoom out using: \033[0;91;1m'.s:tmux_prefix.' + '.s:tmux_zoom_key.'\033[0m\nOr with tmux resize-pane -Z\"" Enter')
+        call s:SendTmuxKeys('echo -e "\033[0;93;1mZoom out using: \033[0;91;1m'.s:tmux_prefix.' + '.s:tmux_zoom_key.'\033[0m\nOr with tmux resize-pane -Z"')
 endfunction
 
 " hides the runner pane (the same as zooming into the vim pane)
@@ -208,13 +215,13 @@ function! s:TriggerTmuxCommand()
                 echoerr 'No tmux command specified!'
                 return
         endif
-        call s:ExecTmuxCommand('send-keys -t %'.t:runner_pane_id.' '.t:tmux_command.' Enter')
+        call s:SendTmuxKeys(t:tmux_command)
 endfunction
 
 " sends lines to runner pane for execution
 function! s:SendLines() range
         for line in getline(a:firstline, a:lastline)
-                call s:ExecTmuxCommand('send-keys -t %'.t:runner_pane_id.' "'.line.'" Enter')
+                call s:SendTmuxKeys(line)
         endfor
 endfunction
 
