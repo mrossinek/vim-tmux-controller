@@ -66,6 +66,8 @@ COMMANDS                                *vim-tmux-controller-commands*
                         selecting is still possible and will give you some
                         idea of where your cursor is.
                         This command is done when pressing `Ctrl+C`.
+                        Note: copy-mode will intentionally not be left, in
+                        order to be able to see, where one has scrolled too.
 
                                         *vim-tmux-controller-command*
 *:VtcSetCommand*          Sets the default command that is send to the runner

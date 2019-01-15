@@ -83,6 +83,11 @@ function! s:TmuxZoomWrapper(pane_id)
         endif
 endfunction
 
+" exits copy-mode if runner pane is in it
+function! s:ExitCopyMode()
+        call s:ExecTmuxCommand('send-keys -t %'.t:runner_pane_id.' -X cancel')
+endfunction
+
 " }}}
 
 " RUNNER PANE {{{
@@ -112,6 +117,7 @@ function! s:AttachRunnerPane()
                 call s:ExecTmuxCommand('display-panes -d 0 "select-pane -t %%" \; "last-pane"')
                 let t:runner_pane_id = str2nr(split(s:ExecTmuxCommand('display-message -p -t ! "#D"'), '%')[0])
         endif
+        call s:ExitCopyMode()
         call s:ChangeRootDir()
         call s:ClearRunnerPane()
 endfunction
@@ -135,6 +141,7 @@ endfunction
 " clears the runner pane
 function! s:ClearRunnerPane()
         call s:EnsurePane(1)
+        call s:ExitCopyMode()
         call s:SendTmuxKeys('clear')
 endfunction
 
@@ -226,6 +233,7 @@ function! s:TriggerTmuxCommand()
                 return
         endif
         call s:EnsurePane(1)
+        call s:ExitCopyMode()
         call s:SendTmuxKeys(t:tmux_command)
 endfunction
 
@@ -236,6 +244,7 @@ endfunction
 " sends lines to runner pane for execution
 function! s:SendLines() range
         call s:EnsurePane(1)
+        call s:ExitCopyMode()
         for line in getline(a:firstline, a:lastline)
                 call s:SendTmuxKeys(line)
         endfor
