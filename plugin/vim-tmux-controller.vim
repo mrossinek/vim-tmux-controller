@@ -130,13 +130,10 @@ function! s:FocusRunnerPane()
         call s:ExecTmuxCommand('select-pane -t %'.t:runner_pane_id)
 endfunction
 
-" zooms into the runner pane
-function! s:ZoomRunnerPane()
-        if !exists('t:runner_pane_id')
-                echoerr 'No runner pane specified yet!'
-                return
-        endif
-        call s:ExecTmuxCommand('resize-pane -Z -t %'.t:runner_pane_id)
+" zooms given pane
+function! s:TmuxZoomWrapper(pane_id)
+        call s:EnsurePane(1)
+        call s:ExecTmuxCommand('resize-pane -Z -t %'.a:pane_id)
         if !exists('s:tmux_prefix')
                 let s:tmux_prefix = system("tmux list-keys | grep send-prefix | awk '{print $4}'")
                 let s:tmux_prefix = substitute(s:tmux_prefix, '\n', '', '')
@@ -145,20 +142,17 @@ function! s:ZoomRunnerPane()
                 let s:tmux_zoom_key = system("tmux list-keys | grep 'resize-pane -Z' | awk '{print $4}'")
                 let s:tmux_zoom_key = substitute(s:tmux_zoom_key, '\n', '', '')
         endif
+endfunction
+
+" zooms into the runner pane
+function! s:ZoomRunnerPane()
+        call s:TmuxZoomWrapper(t:runner_pane_id)
         call s:SendTmuxKeys('echo -e "\033[0;93;1mZoom out using: \033[0;91;1m'.s:tmux_prefix.' + '.s:tmux_zoom_key.'\033[0m\nOr with tmux resize-pane -Z"')
 endfunction
 
 " hides the runner pane (the same as zooming into the vim pane)
 function! s:HideRunnerPane()
-        call s:ExecTmuxCommand('resize-pane -Z -t %'.t:vim_pane_id)
-        if !exists('s:tmux_prefix')
-                let s:tmux_prefix = system("tmux list-keys | grep send-prefix | awk '{print $4}'")
-                let s:tmux_prefix = substitute(s:tmux_prefix, '\n', '', '')
-        endif
-        if !exists('s:tmux_zoom_key')
-                let s:tmux_zoom_key = system("tmux list-keys | grep 'resize-pane -Z' | awk '{print $4}'")
-                let s:tmux_zoom_key = substitute(s:tmux_zoom_key, '\n', '', '')
-        endif
+        call s:TmuxZoomWrapper(s:vim_pane_id)
         echohl WarningMsg | echon 'Zoom out using: ' | echohl ErrorMsg | echon s:tmux_prefix.' + '.s:tmux_zoom_key | echohl None | echo 'Or with :!tmux resize-pane -Z'
 endfunction
 
