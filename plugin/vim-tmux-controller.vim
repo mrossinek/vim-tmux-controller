@@ -153,7 +153,7 @@ endfunction
 " hides the runner pane (the same as zooming into the vim pane)
 function! s:HideRunnerPane()
         call s:TmuxZoomWrapper(s:vim_pane_id)
-        echohl WarningMsg | echon 'Zoom out using: ' | echohl ErrorMsg | echon s:tmux_prefix.' + '.s:tmux_zoom_key | echohl None | echo 'Or with :!tmux resize-pane -Z'
+        echohl WarningMsg | echon 'Zoom out using: ' | echohl ErrorMsg | echon s:tmux_prefix.' + '.s:tmux_zoom_key | echohl None | echon "\t[Or with :!tmux resize-pane -Z]"
 endfunction
 
 
