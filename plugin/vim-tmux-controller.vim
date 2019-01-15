@@ -57,6 +57,7 @@ function! s:GetPaneId(...)
         endfor
 endfunction
 
+" cd's runner pane into vims cwd
 function! s:ChangeRootDir()
         call s:EnsurePane(1)
         call s:SendTmuxKeys(getcwd())
@@ -189,7 +190,9 @@ endfunction
 
 " flushes the tmux command
 function! s:FlushTmuxCommand()
-        unlet t:tmux_command
+        if exists('t:tmux_command')
+                unlet t:tmux_command
+        endif
 endfunction
 
 " kills the running tmux command
