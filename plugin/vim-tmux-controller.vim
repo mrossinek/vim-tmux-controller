@@ -3,6 +3,29 @@ if exists('g:vtc_loaded')
         finish
 endif
 
+" ensures a runner pane exists
+" if force is set to false, no pane is attached in case none existed yet
+function! s:EnsurePane(force)
+        let l:pane_exists = 0
+        if exists('t:runner_pane_id')
+                " if pane id is set, ensure its still in tmux
+                let l:panes = s:ExecTmuxCommand('list-panes -a -F "#{pane_id}"')
+                let l:found = 0
+                for pane in split(l:panes, '\n')
+                        if pane =~# '%'.t:runner_pane_id
+                                let l:found = 1
+                        endif
+                endfor
+                if l:found
+                        let l:pane_exists = 1
+                endif
+        endif
+        if !l:pane_exists && a:force
+                unlet t:runner_pane_id
+                call s:AttachRunnerPane()
+        endif
+endfunction
+
 " executes a given command in the tmux shell
 function! s:ExecTmuxCommand(cmd)
         return system('tmux '.a:cmd)
@@ -35,10 +58,7 @@ function! s:GetPaneId(...)
 endfunction
 
 function! s:ChangeRootDir()
-        if !exists('t:runner_pane_id')
-                echoerr 'No runner pane to specified yet!'
-                return
-        endif
+        call s:EnsurePane(1)
         call s:SendTmuxKeys(getcwd())
 endfunction
 
@@ -73,38 +93,29 @@ endfunction
 
 " detaches from the runner pane
 function! s:DetachRunnerPane()
-        if !exists('t:runner_pane_id')
-                echo 'No runner pane to detach from.'
-                return
+        if exists('t:runner_pane_id')
+                unlet t:runner_pane_id
         endif
-        unlet t:runner_pane_id
 endfunction
 
 " kills the runner pane
 function! s:KillRunnerPane()
-        if !exists('t:runner_pane_id')
-                echo 'No runner pane to kill.'
-                return
+        call s:EnsurePane(0)
+        if exists('t:runner_pane_id')
+                call s:ExecTmuxCommand('kill-pane -t %'.t:runner_pane_id)
+                unlet t:runner_pane_id
         endif
-        call s:ExecTmuxCommand('kill-pane -t %'.t:runner_pane_id)
-        unlet t:runner_pane_id
 endfunction
 
 " clears the runner pane
 function! s:ClearRunnerPane()
-        if !exists('t:runner_pane_id')
-                echo 'No runner pane to clear.'
-                return
-        endif
+        call s:EnsurePane(1)
         call s:SendTmuxKeys('clear')
 endfunction
 
 " scroll inside the runner pane
 function! s:ScrollRunnerPane()
-        if !exists('t:runner_pane_id')
-                echoerr 'No runner pane to scroll in!'
-                return
-        endif
+        call s:EnsurePane(1)
         call s:ExecTmuxCommand('copy-mode -t %'.t:runner_pane_id)
         while 1
                 " cannot use s:SendTmuxKeys because Enter shall not be printed
@@ -114,10 +125,7 @@ endfunction
 
 " moves focus to the runner pane
 function! s:FocusRunnerPane()
-        if !exists('t:runner_pane_id')
-                echoerr 'No runner pane specified yet!'
-                return
-        endif
+        call s:EnsurePane(1)
         call s:ExecTmuxCommand('select-pane -t %'.t:runner_pane_id)
 endfunction
 
@@ -186,10 +194,7 @@ endfunction
 
 " kills the running tmux command
 function! s:KillTmuxCommand()
-        if !exists('t:runner_pane_id')
-                echoerr 'No runner pane specified yet!'
-                return
-        endif
+        call s:EnsurePane(1)
         let l:pane_pid = s:ExecTmuxCommand('display-message -p -t %'.t:runner_pane_id.' "#{pane_pid}"')
         let l:processes = split(system('pstree -p -n -T '.l:pane_pid), '---')
         if len(l:processes) > 1
@@ -215,11 +220,13 @@ function! s:TriggerTmuxCommand()
                 echoerr 'No tmux command specified!'
                 return
         endif
+        call s:EnsurePane(1)
         call s:SendTmuxKeys(t:tmux_command)
 endfunction
 
 " sends lines to runner pane for execution
 function! s:SendLines() range
+        call s:EnsurePane(1)
         for line in getline(a:firstline, a:lastline)
                 call s:SendTmuxKeys(line)
         endfor
