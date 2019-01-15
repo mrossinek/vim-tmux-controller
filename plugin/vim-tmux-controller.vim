@@ -3,6 +3,8 @@ if exists('g:vtc_loaded')
         finish
 endif
 
+" GENERAL HELPER {{{
+
 " ensures a runner pane exists
 " if force is set to false, no pane is attached in case none existed yet
 function! s:EnsurePane(force)
@@ -26,16 +28,15 @@ function! s:EnsurePane(force)
         endif
 endfunction
 
-" executes a given command in the tmux shell
-function! s:ExecTmuxCommand(cmd)
-        return system('tmux '.a:cmd)
+" cd's runner pane into vims cwd
+function! s:ChangeRootDir()
+        call s:EnsurePane(1)
+        call s:SendTmuxKeys(getcwd())
 endfunction
 
-" sends keys to tmux shell
-function! s:SendTmuxKeys(keys)
-        let l:keys = substitute(a:keys, '"', '\\"', 'g')
-        return s:ExecTmuxCommand('send-keys -t %'.t:runner_pane_id.' "'.l:keys.'" Enter')
-endfunction
+" }}}
+
+" TMUX HELPER {{{
 
 " returns the unique tmux pane id of either
 "       a) the corresponding pane index given to the function
@@ -57,11 +58,34 @@ function! s:GetPaneId(...)
         endfor
 endfunction
 
-" cd's runner pane into vims cwd
-function! s:ChangeRootDir()
-        call s:EnsurePane(1)
-        call s:SendTmuxKeys(getcwd())
+" executes a given command in the tmux shell
+function! s:ExecTmuxCommand(cmd)
+        return system('tmux '.a:cmd)
 endfunction
+
+" sends keys to tmux shell
+function! s:SendTmuxKeys(keys)
+        let l:keys = substitute(a:keys, '"', '\\"', 'g')
+        return s:ExecTmuxCommand('send-keys -t %'.t:runner_pane_id.' "'.l:keys.'" Enter')
+endfunction
+
+" zooms given pane
+function! s:TmuxZoomWrapper(pane_id)
+        call s:EnsurePane(1)
+        call s:ExecTmuxCommand('resize-pane -Z -t %'.a:pane_id)
+        if !exists('s:tmux_prefix')
+                let s:tmux_prefix = system("tmux list-keys | grep send-prefix | awk '{print $4}'")
+                let s:tmux_prefix = substitute(s:tmux_prefix, '\n', '', '')
+        endif
+        if !exists('s:tmux_zoom_key')
+                let s:tmux_zoom_key = system("tmux list-keys | grep 'resize-pane -Z' | awk '{print $4}'")
+                let s:tmux_zoom_key = substitute(s:tmux_zoom_key, '\n', '', '')
+        endif
+endfunction
+
+" }}}
+
+" RUNNER PANE {{{
 
 " attach a runner pane
 "       a) create a new one if vim pane is only one in current window
@@ -130,20 +154,6 @@ function! s:FocusRunnerPane()
         call s:ExecTmuxCommand('select-pane -t %'.t:runner_pane_id)
 endfunction
 
-" zooms given pane
-function! s:TmuxZoomWrapper(pane_id)
-        call s:EnsurePane(1)
-        call s:ExecTmuxCommand('resize-pane -Z -t %'.a:pane_id)
-        if !exists('s:tmux_prefix')
-                let s:tmux_prefix = system("tmux list-keys | grep send-prefix | awk '{print $4}'")
-                let s:tmux_prefix = substitute(s:tmux_prefix, '\n', '', '')
-        endif
-        if !exists('s:tmux_zoom_key')
-                let s:tmux_zoom_key = system("tmux list-keys | grep 'resize-pane -Z' | awk '{print $4}'")
-                let s:tmux_zoom_key = substitute(s:tmux_zoom_key, '\n', '', '')
-        endif
-endfunction
-
 " zooms into the runner pane
 function! s:ZoomRunnerPane()
         call s:TmuxZoomWrapper(t:runner_pane_id)
@@ -156,11 +166,9 @@ function! s:HideRunnerPane()
         echohl WarningMsg | echon 'Zoom out using: ' | echohl ErrorMsg | echon s:tmux_prefix.' + '.s:tmux_zoom_key | echohl None | echon "\t[Or with :!tmux resize-pane -Z]"
 endfunction
 
+" }}}
 
-" moves focus to the vim pane
-function! s:FocusVimPane()
-        call s:ExecTmuxCommand('select-pane -t %'.s:vim_pane_id)
-endfunction
+" COMMAND {{{
 
 " sets the command sent to tmux by default
 function! s:SetTmuxCommand(...)
@@ -221,6 +229,10 @@ function! s:TriggerTmuxCommand()
         call s:SendTmuxKeys(t:tmux_command)
 endfunction
 
+" }}}
+
+" LINES AND FILES {{{
+
 " sends lines to runner pane for execution
 function! s:SendLines() range
         call s:EnsurePane(1)
@@ -233,6 +245,10 @@ endfunction
 function! s:SendFile()
         execute('%VtcSendLines')
 endfunction
+
+" }}}
+
+" INITIALIZATION {{{
 
 " initializes some variables
 function! s:Initialize()
@@ -297,6 +313,8 @@ function! s:DefineKeymaps()
         " tmux 'G' (i.e. bottom = total file)
         nnoremap <leader>tg :VtcSendFile<cr>
 endfunction
+
+" }}}
 
 call s:Initialize()
 call s:DefineCommands()
