@@ -84,11 +84,8 @@ COMMANDS                                *vim-tmux-controller-commands*
                         user to specify a new command, in case no one exists
                         yet.
 
-                                        *vim-tmux-controller-flush*
-*:VtcFlushCommand*        Deletes the default command (i.e. flushes it).
-
-                                        *vim-tmux-controller-kill-cmd*
-*:VtcKillCommand*         Kills the running command in the runner pane. First,
+                                        *vim-tmux-controller-quit*
+*:VtcQuitCommand*         Quits the running command in the runner pane. First,
                         a TERM signal is sent. If the process does not
                         respond, this is followed by another KILL signal.
 
@@ -112,19 +109,18 @@ MAPPINGS                                *vim-tmux-controller-mappings*
 
 *<leader>ta*            |VtcAttachRunner|
 *<leader>td*            |VtcDetachRunner|
-*<leader>tf*            |VtcFocusRunner|
+*<leader>to*            |VtcFocusRunner| `(mnemonic: fOcus)`
 *<leader>tz*            |VtcZoomRunner|
 *<leader>th*            |VtcHideRunner|
 *<leader>tk*            |VtcKillRunner|
-*<leader>te*            |VtcClearRunner| `(mnemonic: empty = clear)`
+*<leader>tc*            |VtcClearRunner|
 *<leader>ts*            |VtcScrollRunner|
 *<leader>tr*            |VtcRotateRunner|
-*<leader>tc*            |VtcSetCommand|
+*<leader>tm*            |VtcSetCommand| `(mnemonic: coMMand)`
 *<leader>tt*            |VtcTriggerCommand|
-*<leader>tj*            |VtcFlushCommand| `(mnemonic: flush = down = j)`
-*<leader>tx*            |VtcKillCommand| `(mnemonic: kill = cross out = x)`
+*<leader>tq*            |VtcQuitCommand|
 *<leader>tl*            |VtcSendLines|
-*<leader>tg*            |VtcSendFile| `(mnemonic: file = all -> bottom = G)`
+*<leader>tf*            |VtcSendFile|
 
 ==============================================================================
 CONFIGURATION                           *vim-tmux-controller-configuration*

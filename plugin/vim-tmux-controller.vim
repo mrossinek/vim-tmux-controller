@@ -221,15 +221,8 @@ function! s:SetTmuxCommand(...)
         endif
 endfunction
 
-" flushes the tmux command
-function! s:FlushTmuxCommand()
-        if exists('t:tmux_command')
-                unlet t:tmux_command
-        endif
-endfunction
-
-" kills the running tmux command
-function! s:KillTmuxCommand()
+" quits the running tmux command
+function! s:QuitTmuxCommand()
         call s:EnsurePane(1)
         let l:pane_pid = s:ExecTmuxCommand('display-message -p -t %'.t:runner_pane_id.' "#{pane_pid}"')
         let l:processes = split(system('pstree -p -n -T '.l:pane_pid), '---')
@@ -295,7 +288,7 @@ function! s:SendFile()
                 echohl WarningMsg | echo "\rNo runner specified for this filetype!"
                 return
         endif
-        call s:KillTmuxCommand()
+        call s:QuitTmuxCommand()
         call s:SendTmuxKeys(l:runner.' '.expand('%:t'))
 endfunction
 
@@ -335,8 +328,7 @@ function! s:DefineCommands()
         command! VtcClearRunner call s:ClearRunnerPane()
         command! VtcScrollRunner call s:ScrollRunnerPane()
         command! VtcRotateRunner call s:RotateRunnerPane()
-        command! VtcFlushCommand call s:FlushTmuxCommand()
-        command! VtcKillCommand call s:KillTmuxCommand()
+        command! VtcQuitCommand call s:QuitTmuxCommand()
         command! VtcSetCommand call s:SetTmuxCommand()
         command! VtcTriggerCommand call s:TriggerTmuxCommand()
         command! -range VtcSendLines <line1>,<line2>call s:SendLines()
@@ -345,37 +337,35 @@ endfunction
 
 " define standard keymaps for some commands
 function! s:DefineKeymaps()
-        " tmux attach
+        " tmux Attach
         nnoremap <leader>ta :VtcAttachRunner<cr>
-        " tmux detach
+        " tmux Detach
         nnoremap <leader>td :VtcDetachRunner<cr>
-        " tmux focus
-        nnoremap <leader>tf :VtcFocusRunner<cr>
-        " tmux zoom
+        " tmux fOcus
+        nnoremap <leader>to :VtcFocusRunner<cr>
+        " tmux Zoom
         nnoremap <leader>tz :VtcZoomRunner<cr>
-        " tmux hide
+        " tmux Hide
         nnoremap <leader>th :VtcHideRunner<cr>
-        " tmux kill
+        " tmux Kill
         nnoremap <leader>tk :VtcKillRunner<cr>
-        " tmux 'empty' (i.e. clear)
-        nnoremap <leader>te :VtcClearRunner<cr>
-        " tmux scroll
+        " tmux Clear
+        nnoremap <leader>tc :VtcClearRunner<cr>
+        " tmux Scroll
         nnoremap <leader>ts :VtcScrollRunner<cr>
-        " tmux rotate
+        " tmux Rotate
         nnoremap <leader>tr :VtcRotateRunner<cr>
-        " tmux 'down' (i.e. flush)
-        nnoremap <leader>tj :VtcFlushCommand<cr>
-        " tmux 'cross out' (i.e. kill command)
-        nnoremap <leader>tx :VtcKillCommand<cr>
-        " tmux command
-        nnoremap <leader>tc :VtcSetCommand<cr>
-        " tmux trigger
+        " tmux Quit
+        nnoremap <leader>tq :VtcQuitCommand<cr>
+        " tmux coMmand
+        nnoremap <leader>tm :VtcSetCommand<cr>
+        " tmux Trigger
         nnoremap <leader>tt :VtcTriggerCommand<cr>
-        " tmux lines
+        " tmux Lines
         nnoremap <leader>tl :VtcSendLines<cr>
         vnoremap <leader>tl :VtcSendLines<cr>
-        " tmux 'G' (i.e. bottom = total file)
-        nnoremap <leader>tg :VtcSendFile<cr>
+        " tmux File
+        nnoremap <leader>tf :VtcSendFile<cr>
 endfunction
 
 " }}}
