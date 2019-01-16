@@ -42,13 +42,13 @@ endfunction
 "       a) the corresponding pane index given to the function
 "       b) the currently active pane
 function! s:GetPaneId(...)
-        if a:0 == 0
+        if a:0
+                let format = '#P #D'
+                let match = a:1
+        else
                 let format = '#{pane_active} #D'
                 let match = '1'
                 " the active pane is designated by a 1 in list-panes
-        else
-               let format = '#P #D'
-               let match = a:1
         endif
         let panes = s:ExecTmuxCommand('list-panes -F "'.format.'"')
         for pane in split(panes, '\n')
@@ -214,7 +214,7 @@ function! s:SetTmuxCommand(...)
                         return
                 endif
         endif
-        if a:0 == 1
+        if a:0
                 let t:tmux_command = a:1
         else
                 let t:tmux_command = input('Command: ')
