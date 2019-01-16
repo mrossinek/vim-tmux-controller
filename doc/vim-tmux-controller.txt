@@ -98,8 +98,12 @@ COMMANDS                                *vim-tmux-controller-commands*
                         |normal| and |visual| mode.
 
                                         *vim-tmux-controller-file*
-*:VtrSendFile*            This is a convenient shortcut to send the whole file
-                        for execution to the runner pane.
+*:VtrSendFile*            Sends the whole file to be executed in the runner
+                        pane. The executable to be used is determined based on
+                        the |filetype|. WARNING: 'filetype' needs to be set
+                        for this function to work properly!
+                        Note: the executables for the runners are configured
+                        via the |g:vtc_runners| dictionary.
 
 ==============================================================================
 MAPPINGS                                *vim-tmux-controller-mappings*
@@ -149,6 +153,15 @@ as the absolute value of lines (horizontally) or cells (vertically). Note:
 Both of these values are actively used regardless of the |g:vtc_orientation|
 setting! Once the user calls |VtcRotateRunner| the other dimension will be
 required to scale the pane accordingly.
+
+*g:vtc_runners*                         `Default: see below`
+Configures the executables used to run whole files. The default values are:
+>
+          {
+        \ 'python':       'python',
+        \ 'ruby':         'ruby',
+        \ 'sh':           'sh',
+        \ }
 
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:

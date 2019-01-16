@@ -276,7 +276,27 @@ endfunction
 
 " send entire file to runner pane for execution
 function! s:SendFile()
-        execute('%VtcSendLines')
+        let l:enabled = substitute(split(execute(':filetype'))[1], 'detection:', '', '')
+        if l:enabled !=# 'ON'
+                echoerr 'This functionality requires the filetype option to be enabled!'
+                return
+        endif
+        if &filetype ==? ''
+                execute(':filetype detect')
+                if &filetype ==? ''
+                        echoerr 'This functionality requires a valid filetype to be set!'
+                        return
+                endif
+        endif
+        call s:EnsurePane(1)
+        call s:ExitCopyMode()
+        let l:runner = get(g:vtc_runners, &filetype, '')
+        if l:runner ==? ''
+                echohl WarningMsg | echo "\rNo runner specified for this filetype!"
+                return
+        endif
+        call s:KillTmuxCommand()
+        call s:SendTmuxKeys(l:runner.' '.expand('%:t'))
 endfunction
 
 " }}}
@@ -291,6 +311,13 @@ function! s:Initialize()
         let g:vtc_percentage = 0
         let g:vtc_pane_height = 10
         let g:vtc_pane_width = 85
+
+        " filetype dictionary for whole file interpretation
+        let g:vtc_runners = {
+                \ 'python':     'python',
+                \ 'ruby':       'ruby',
+                \ 'sh':         'sh',
+                \ }
 
         " local variables
         " use the currently active pane on vim startup
