@@ -22,7 +22,7 @@ Installation
 I would recommend using [minpac](https://github.com/k-takata/minpac) which makes extensive use of the package feature
 which was added to Vim 8 and Neovim.
 ```
-call minpac#add('mrossinek/vim-tmux-controller')
+call minpac#add('https://gitlab.com/mrossinek/vim-tmux-controller')
 ```
 Other package managers work in a similar fashion.
 
