@@ -46,11 +46,6 @@ COMMANDS                                *vim-tmux-controller-commands*
                         to occupy the entire screen. It also prints an info
                         for the user on how to zoom out again.
 
-                                        *vim-tmux-controller-hide*
-*:VtcHideRunner*          Hides the runner pane (this is equivalent to zooming
-                        into the vim pane). This command also prints an info
-                        for the user on how to zoom out again.
-
                                         *vim-tmux-controller-kill*
 *:VtcKillRunner*          Kills the runner pane, thereby closing it.
 
@@ -68,12 +63,6 @@ COMMANDS                                *vim-tmux-controller-commands*
                         This command is done when pressing `Ctrl+C`.
                         Note: copy-mode will intentionally not be left, in
                         order to be able to see, where one has scrolled too.
-
-                                        *vim-tmux-controller-rotate*
-*:VtcRotateRunner*        Rotates the current orientation of the vim and runner
-                        pane. WARNING: This is possibly the most unstable
-                        feature of this plugin and should be used with some
-                        scepticism sprinkled into the mix.
 
                                         *vim-tmux-controller-command*
 *:VtcSetCommand*          Sets the default command that is send to the runner
@@ -111,11 +100,9 @@ MAPPINGS                                *vim-tmux-controller-mappings*
 *<leader>td*            |VtcDetachRunner|
 *<leader>to*            |VtcFocusRunner| `(mnemonic: fOcus)`
 *<leader>tz*            |VtcZoomRunner|
-*<leader>th*            |VtcHideRunner|
 *<leader>tk*            |VtcKillRunner|
 *<leader>tc*            |VtcClearRunner|
 *<leader>ts*            |VtcScrollRunner|
-*<leader>tr*            |VtcRotateRunner|
 *<leader>tm*            |VtcSetCommand| `(mnemonic: coMMand)`
 *<leader>tt*            |VtcTriggerCommand|
 *<leader>tq*            |VtcQuitCommand|
@@ -145,10 +132,7 @@ measure. Note: The possible values are `0` and `1`.
 *g:vtc_pane_width*                      `Default: 85`
 Define the default sizes of the runner pane. If |g:vtc_percentage| is set to
 true, this value will be interpreted in percent, otherwise it is interpreted
-as the absolute value of lines (horizontally) or cells (vertically). Note:
-Both of these values are actively used regardless of the |g:vtc_orientation|
-setting! Once the user calls |VtcRotateRunner| the other dimension will be
-required to scale the pane accordingly.
+as the absolute value of lines (horizontally) or cells (vertically).
 
 *g:vtc_runners*                         `Default: see below`
 Configures the executables used to run whole files. The default values are:

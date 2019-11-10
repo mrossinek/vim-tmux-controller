@@ -20,10 +20,6 @@ function! s:Initialize()
                 \ 'ruby':       'ruby',
                 \ 'sh':         'sh',
                 \ }
-
-        " local variables
-        " use the currently active pane on vim startup
-        let t:vim_pane_id = VTC#GetPaneId()
 endfunction
 
 " make some function available via commands
@@ -32,11 +28,9 @@ function! s:DefineCommands()
         command! VtcDetachRunner call VTC#DetachRunnerPane()
         command! VtcFocusRunner call VTC#FocusRunnerPane()
         command! VtcZoomRunner call VTC#ZoomRunnerPane()
-        command! VtcHideRunner call VTC#HideRunnerPane()
         command! VtcKillRunner call VTC#KillRunnerPane()
         command! VtcClearRunner call VTC#ClearRunnerPane()
         command! VtcScrollRunner call VTC#ScrollRunnerPane()
-        command! VtcRotateRunner call VTC#RotateRunnerPane()
         command! VtcQuitCommand call VTC#QuitTmuxCommand()
         command! VtcSetCommand call VTC#SetTmuxCommand()
         command! VtcTriggerCommand call VTC#TriggerTmuxCommand()
@@ -54,16 +48,12 @@ function! s:DefineKeymaps()
         nnoremap <leader>to :VtcFocusRunner<cr>
         " tmux Zoom
         nnoremap <leader>tz :VtcZoomRunner<cr>
-        " tmux Hide
-        nnoremap <leader>th :VtcHideRunner<cr>
         " tmux Kill
         nnoremap <leader>tk :VtcKillRunner<cr>
         " tmux Clear
         nnoremap <leader>tc :VtcClearRunner<cr>
         " tmux Scroll
         nnoremap <leader>ts :VtcScrollRunner<cr>
-        " tmux Rotate
-        nnoremap <leader>tr :VtcRotateRunner<cr>
         " tmux Quit
         nnoremap <leader>tq :VtcQuitCommand<cr>
         " tmux coMmand

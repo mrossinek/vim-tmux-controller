@@ -31,26 +31,6 @@ endfunction
 
 " TMUX HELPER
 
-" returns the unique tmux pane id of either
-"       a) the corresponding pane index given to the function
-"       b) the currently active pane
-function! VTC#GetPaneId(...)
-        if a:0
-                let format = '#P #D'
-                let match = a:1
-        else
-                let format = '#{pane_active} #D'
-                let match = '1'
-                " the active pane is designated by a 1 in list-panes
-        endif
-        let panes = s:ExecTmuxCommand('list-panes -F "'.format.'"')
-        for pane in split(panes, '\n')
-                if pane =~# '^'.match
-                        return str2nr(split(pane, '%')[1])
-                endif
-        endfor
-endfunction
-
 " executes a given command in the tmux shell
 function! s:ExecTmuxCommand(cmd)
         return system('tmux '.a:cmd)
@@ -161,31 +141,6 @@ endfunction
 function! VTC#ZoomRunnerPane()
         call s:TmuxZoomWrapper(t:runner_pane_id)
         call s:SendTmuxKeys('echo -e "\033[0;93;1mZoom out using: \033[0;91;1m'.s:tmux_prefix.' + '.s:tmux_zoom_key.'\033[0m\nOr with tmux resize-pane -Z"')
-endfunction
-
-" hides the runner pane (the same as zooming into the vim pane)
-function! VTC#HideRunnerPane()
-        call s:TmuxZoomWrapper(t:vim_pane_id)
-        echohl WarningMsg | echon 'Zoom out using: ' | echohl ErrorMsg | echon s:tmux_prefix.' + '.s:tmux_zoom_key | echohl None | echon "\t[Or with :!tmux resize-pane -Z]"
-endfunction
-
-" rotates the runner and vim pane
-function! VTC#RotateRunnerPane()
-        let l:old_layout = s:ExecTmuxCommand('display-message -p "#{window_layout}"')
-        if t:current_orientation == 1
-                call s:ExecTmuxCommand('move-pane -d -h -t %'.t:vim_pane_id.' -s %'.t:runner_pane_id)
-                call s:ExecTmuxCommand('resize-pane -t %'.t:runner_pane_id.' -x '.t:converted_pane_width)
-                let t:current_orientation = 0
-        else
-                call s:ExecTmuxCommand('move-pane -d -v -t %'.t:vim_pane_id.' -s %'.t:runner_pane_id)
-                call s:ExecTmuxCommand('resize-pane -t %'.t:runner_pane_id.' -y '.t:converted_pane_height)
-                let t:current_orientation = 1
-        endif
-        let l:new_layout = s:ExecTmuxCommand('display-message -p "#{window_layout}"')
-        " ensures correct flipping in case of wrong initial orientation
-        if l:new_layout =~# l:old_layout
-                call VTC#RotateRunnerPane()
-        endif
 endfunction
 
 " COMMAND
