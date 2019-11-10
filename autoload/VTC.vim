@@ -87,8 +87,15 @@ function! VTC#AttachRunnerPane()
                 endif
                 call s:ExecTmuxCommand('last-pane')
         else
-                call s:ExecTmuxCommand('display-panes -d 0 "select-pane -t %%" \; "last-pane"')
-                let t:runner_pane_id = str2nr(split(s:ExecTmuxCommand('display-message -p -t ! "#D"'), '%')[0])
+                let l:prev_pane = str2nr(split(s:ExecTmuxCommand('display-message -p "#D"'), '%')[0])
+                call s:ExecTmuxCommand('display-panes -d 0 "select-pane -t %%"')
+                let l:cur_pane = str2nr(split(s:ExecTmuxCommand('display-message -p "#D"'), '%')[0])
+                if l:cur_pane !=# l:prev_pane
+                    call s:ExecTmuxCommand('last-pane')
+                    let t:runner_pane_id = str2nr(split(s:ExecTmuxCommand('display-message -p -t ! "#D"'), '%')[0])
+                else
+                    return
+                endif
         endif
         call s:ExitCopyMode()
         call s:ChangeRootDir()
