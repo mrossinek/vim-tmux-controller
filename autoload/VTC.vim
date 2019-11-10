@@ -86,12 +86,9 @@ function! VTC#AttachRunnerPane()
                         let t:runner_pane_id = str2nr(split(s:ExecTmuxCommand('split-window -P -F "#D" -h -l '.t:converted_pane_width), '%')[0])
                 endif
                 call s:ExecTmuxCommand('last-pane')
-                let t:current_orientation = g:vtc_orientation
         else
                 call s:ExecTmuxCommand('display-panes -d 0 "select-pane -t %%" \; "last-pane"')
                 let t:runner_pane_id = str2nr(split(s:ExecTmuxCommand('display-message -p -t ! "#D"'), '%')[0])
-                " assume attaching is done mostly to attain other orientation
-                let t:current_orientation = 1 - g:vtc_orientation
         endif
         call s:ExitCopyMode()
         call s:ChangeRootDir()
