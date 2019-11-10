@@ -118,7 +118,7 @@ endfunction
 function! VTC#ClearRunnerPane()
         call s:EnsurePane(1)
         call s:ExitCopyMode()
-        call s:SendTmuxKeys('clear')
+        call s:ExecTmuxCommand('send-keys -t %'.t:runner_pane_id.' ""')
 endfunction
 
 " scroll inside the runner pane
