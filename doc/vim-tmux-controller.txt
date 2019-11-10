@@ -95,7 +95,7 @@ COMMANDS                                *vim-tmux-controller-commands*
                         |normal| and |visual| mode.
 
                                         *vim-tmux-controller-file*
-*:VtrSendFile*            Sends the whole file to be executed in the runner
+*:VtcSendFile*            Sends the whole file to be executed in the runner
                         pane. The executable to be used is determined based on
                         the |filetype|. WARNING: 'filetype' needs to be set
                         for this function to work properly!
